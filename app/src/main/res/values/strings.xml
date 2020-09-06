@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">school</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="exams">Exams</string>
+    <string name="results">Results</string>
+    <string name="test_sets">Test Sets</string>
+    <string name="privous_exams">Previous Exams</string>
+    <string name="study_materials">Study Materials</string>
+    <string name="info">Info</string>
+    <string name="previous">Previous</string>
+    <string name="next">Next</string>
+    <string name="op4">Op4</string>
+    <string name="op3">Op3</string>
+    <string name="op2">Op2</string>
+    <string name="op1">Op1</string>
+    <string name="questions_text_view">Questions Text View</string>
+    <string name="time">time</string>
+    <string name="subject">Subject</string>
+    <string name="exam_time">ExamTime</string>
+    <string name="full_marks">Full Marks</string>
+    <string name="exam_type">Exam Type</string>
+    <string name="valid">Valid</string>
+    <string name="exam_sub">exam_sub</string>
+</resources>
