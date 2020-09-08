@@ -1,12 +1,14 @@
 package com.biswatex.school;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.content.Intent;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -22,29 +24,38 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ExamsList extends AppCompatActivity {
+public class TakeExam extends AppCompatActivity {
 
-    String cls = "2", sec = "A";
+    String id = "44";
     RecyclerView recyclerView;
     RecyclerView.Adapter mAdapter;
     RecyclerView.LayoutManager layoutManager;
     RequestQueue rq;
-    List<ExamModel> examModelList;
-    String request_url = "http://biswatex.com/api/examsfetch.php";
-
-
+    public static List<QuestionModel> questionModelList;
+    String request_url = "http://biswatex.com/api/questionfetch.php";
+    static String time = "";
+    static  CountDownTimer Counter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_examinations);
+        setContentView(R.layout.activity_start_exam);
+        Intent intent = getIntent();
+        final TextView timer = findViewById(R.id.txt_timer_take_exam);
         rq = Volley.newRequestQueue(this);
-        recyclerView = findViewById(R.id.recyclerviewexaminations);
+        recyclerView = findViewById(R.id.recyclerview_startExam);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        examModelList = new ArrayList<>();
+        questionModelList = new ArrayList<>();
         sendRequest();
+        Counter = new CountDownTimer(300000, 1000) {
+            public void onTick(long millisUntilFinished) {
+                timer.setText(""+millisUntilFinished / 1000);
+            }
+            public void onFinish() {
+                timer.setText("done!");
+            }
+        }.start();
     }
     public void sendRequest(){
 //        Map<String, String> params = new HashMap<String, String>();
@@ -59,29 +70,26 @@ public class ExamsList extends AppCompatActivity {
                 try {
                     JSONArray jsonArray = new JSONArray(response);
                     for(int i = 0; i < jsonArray.length(); i++){
-                        ExamModel examModel = new ExamModel();
+                        QuestionModel questionModel = new QuestionModel();
                         try{
                             JSONObject jsonObject = jsonArray.getJSONObject(i);
-                            examModel.setExamid(jsonObject.getString("question_set_id"));
-                            examModel.setExamName(jsonObject.getString("teacher_id"));
-                            examModel.setExamClass(jsonObject.getString("class"));
-                            examModel.setexamDuration(jsonObject.getString("start_time"));
-                            examModel.setexamFullMarks(jsonObject.getString("full_marks"));
-                            examModel.setexamPassMarks(jsonObject.getString("pass_marks"));
-                            examModel.setexamSection(jsonObject.getString("sec"));
-                            examModel.setexamSubject(jsonObject.getString("sub"));
-                            examModel.setexamType(jsonObject.getString("type"));
-                            examModel.setexamResultOut(jsonObject.getString("end_time"));
-                            examModel.setExamTeacher(jsonObject.getString("teacher_name"));
+                            questionModel.setquestion(jsonObject.getString("question"));
+                            questionModel.setMarks(jsonObject.getString("marks"));
+                            questionModel.setop1(jsonObject.getString("op_1"));
+                            questionModel.setOp2(jsonObject.getString("op_2"));
+                            questionModel.setOp3(jsonObject.getString("op_3"));
+                            questionModel.setOp4(jsonObject.getString("op_4"));
+                            questionModel.setType(jsonObject.getString("type"));
+                            questionModel.setans(jsonObject.getString("answer"));
                         }catch(JSONException e){
                             e.printStackTrace();
                         }
-                        examModelList.add(examModel);
+                        questionModelList.add(questionModel);
                     }
-                    mAdapter = new CustomRecycleAdapter(ExamsList.this, examModelList,new  CustomRecycleAdapter.TakeExamListner(){
+                    mAdapter = new QuestionAdapter(TakeExam.this, questionModelList,new  QuestionAdapter.SubmitExamListner(){
                         @Override
-                        public void TakeExamOnClick(View v, int position) {
-                            Intent intent = new Intent(ExamsList.this, TakeExam.class);
+                        public void SubmitExamOnClick(View v, int position) {
+                            Intent intent = new Intent(TakeExam.this, QuestionView.class);
                             intent.putExtra("index",position);
                             startActivity(intent);
                         }
@@ -94,15 +102,14 @@ public class ExamsList extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.i("Volley Error: ", error.toString());
+                Log.i("Volley Error : ", error.toString());
             }
         })
         {
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
+            protected Map<String, String> getParams() throws AuthFailureError{
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("sec", sec);
-                params.put("cls", cls);
+                params.put("teacher_exam_id",id);
                 return params;
             }
         };
